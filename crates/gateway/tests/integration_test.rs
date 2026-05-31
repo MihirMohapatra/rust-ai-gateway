@@ -104,7 +104,7 @@ async fn test_health_endpoint() {
         .unwrap();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
-    assert_eq!(json["status"], "ok");
+    assert_eq!(json["status"], "healthy");
     assert_eq!(json["db_connected"], true);
 }
 
