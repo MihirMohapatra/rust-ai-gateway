@@ -16,16 +16,11 @@ pub struct HealthResponse {
 
 /// GET /health - Full health check with dependency status
 pub async fn health_check(State(state): State<AppState>) -> Json<HealthResponse> {
-    let db_ok = sqlx::query("SELECT 1")
-        .execute(&state.db)
-        .await
-        .is_ok();
+    let db_ok = sqlx::query("SELECT 1").execute(&state.db).await.is_ok();
 
     let redis_ok = match state.redis.clone() {
         Some(mut conn) => {
-            let result: Result<String, _> = redis::cmd("PING")
-                .query_async(&mut conn)
-                .await;
+            let result: Result<String, _> = redis::cmd("PING").query_async(&mut conn).await;
             result.is_ok()
         }
         None => false,
@@ -35,7 +30,11 @@ pub async fn health_check(State(state): State<AppState>) -> Json<HealthResponse>
     let pool_idle = state.db.num_idle() as u32;
 
     Json(HealthResponse {
-        status: if db_ok { "healthy".to_string() } else { "degraded".to_string() },
+        status: if db_ok {
+            "healthy".to_string()
+        } else {
+            "degraded".to_string()
+        },
         version: env!("CARGO_PKG_VERSION").to_string(),
         uptime_seconds: std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -51,10 +50,7 @@ pub async fn health_check(State(state): State<AppState>) -> Json<HealthResponse>
 /// GET /health/ready - Readiness probe (for Kubernetes/ECS)
 /// Returns 200 only if all critical dependencies are available
 pub async fn readiness_check(State(state): State<AppState>) -> StatusCode {
-    let db_ok = sqlx::query("SELECT 1")
-        .execute(&state.db)
-        .await
-        .is_ok();
+    let db_ok = sqlx::query("SELECT 1").execute(&state.db).await.is_ok();
 
     if db_ok {
         StatusCode::OK

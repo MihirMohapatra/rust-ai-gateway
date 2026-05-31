@@ -130,4 +130,3 @@ async fn find_api_key_by_prefix(pool: &PgPool, prefix: &str) -> Option<ApiKeyRow
     .ok()
     .flatten()
 }
-

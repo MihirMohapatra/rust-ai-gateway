@@ -1,8 +1,8 @@
-use async_trait::async_trait;
-use reqwest::Client;
 use crate::models::chat::{ChatRequest, ChatResponse};
 use crate::providers::Provider;
 use crate::GatewayError;
+use async_trait::async_trait;
+use reqwest::Client;
 
 pub struct OllamaProvider {
     client: Client,
@@ -52,10 +52,8 @@ impl Provider for OllamaProvider {
             )));
         }
 
-        response
-            .json::<ChatResponse>()
-            .await
-            .map_err(|e| GatewayError::ProviderError(format!("Failed to parse Ollama response: {}", e)))
+        response.json::<ChatResponse>().await.map_err(|e| {
+            GatewayError::ProviderError(format!("Failed to parse Ollama response: {}", e))
+        })
     }
 }
-

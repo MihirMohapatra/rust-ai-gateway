@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use shared::models::chat::{ChatRequest, ChatResponse, Choice, Message, Usage};
+    use shared::models::chat::{ChatRequest, ChatResponse, Message};
     use shared::GatewayError;
 
     #[test]
@@ -55,7 +55,10 @@ mod tests {
         assert_eq!(response.id, "chatcmpl-123");
         assert_eq!(response.model, "gpt-4");
         assert_eq!(response.choices.len(), 1);
-        assert_eq!(response.choices[0].message.content, "Hello! How can I help?");
+        assert_eq!(
+            response.choices[0].message.content,
+            "Hello! How can I help?"
+        );
         assert_eq!(response.usage.as_ref().unwrap().total_tokens, 18);
     }
 
@@ -75,7 +78,10 @@ mod tests {
         assert_eq!(GatewayError::AuthError("test".into()).status_code(), 401);
         assert_eq!(GatewayError::RateLimited.status_code(), 429);
         assert_eq!(GatewayError::BadRequest("test".into()).status_code(), 400);
-        assert_eq!(GatewayError::ProviderError("test".into()).status_code(), 502);
+        assert_eq!(
+            GatewayError::ProviderError("test".into()).status_code(),
+            502
+        );
         assert_eq!(GatewayError::Internal("test".into()).status_code(), 500);
     }
 
@@ -88,4 +94,3 @@ mod tests {
         assert_eq!(err.to_string(), "Authentication failed: bad token");
     }
 }
-

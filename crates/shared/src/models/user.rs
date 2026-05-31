@@ -11,4 +11,3 @@ pub struct User {
     pub created_at: DateTime<Utc>,
     pub is_active: bool,
 }
-

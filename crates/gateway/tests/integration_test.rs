@@ -10,8 +10,8 @@ use tower::ServiceExt;
 use gateway::build_router;
 use gateway::config::AppConfig;
 use gateway::state::AppState;
-use shared::providers::Provider;
 use shared::providers::ollama::OllamaProvider;
+use shared::providers::Provider;
 
 fn test_metrics_handle() -> metrics_exporter_prometheus::PrometheusHandle {
     metrics_exporter_prometheus::PrometheusBuilder::new()
@@ -43,9 +43,9 @@ async fn setup_test_state(database_url: &str, redis_url: Option<&str>) -> AppSta
         None
     };
 
-    let providers: Vec<Box<dyn Provider>> = vec![
-        Box::new(OllamaProvider::new(Some("http://localhost:11434".to_string()))),
-    ];
+    let providers: Vec<Box<dyn Provider>> = vec![Box::new(OllamaProvider::new(Some(
+        "http://localhost:11434".to_string(),
+    )))];
 
     let config = AppConfig {
         database_url: database_url.to_string(),
@@ -69,8 +69,9 @@ async fn setup_test_state(database_url: &str, redis_url: Option<&str>) -> AppSta
 /// Get DATABASE_URL from env or skip test
 fn get_test_database_url() -> String {
     std::env::var("TEST_DATABASE_URL").unwrap_or_else(|_| {
-        std::env::var("DATABASE_URL")
-            .unwrap_or_else(|_| "postgres://postgres:postgres@localhost:5432/ai_gateway_test".to_string())
+        std::env::var("DATABASE_URL").unwrap_or_else(|_| {
+            "postgres://postgres:postgres@localhost:5432/ai_gateway_test".to_string()
+        })
     })
 }
 
@@ -420,4 +421,3 @@ async fn test_create_key_wrong_password() {
 
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 }
-

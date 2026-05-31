@@ -30,18 +30,17 @@ pub async fn get_stats(State(state): State<AppState>) -> Json<StatsResponse> {
     .unwrap_or((0, 0, 0.0));
 
     let last_hour = sqlx::query_scalar::<_, i64>(
-        "SELECT COUNT(*) FROM usage_logs WHERE created_at > NOW() - INTERVAL '1 hour'"
+        "SELECT COUNT(*) FROM usage_logs WHERE created_at > NOW() - INTERVAL '1 hour'",
     )
     .fetch_one(&state.db)
     .await
     .unwrap_or(0);
 
-    let errors = sqlx::query_scalar::<_, i64>(
-        "SELECT COUNT(*) FROM usage_logs WHERE status_code >= 400"
-    )
-    .fetch_one(&state.db)
-    .await
-    .unwrap_or(0);
+    let errors =
+        sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM usage_logs WHERE status_code >= 400")
+            .fetch_one(&state.db)
+            .await
+            .unwrap_or(0);
 
     let error_rate = if totals.0 > 0 {
         errors as f64 / totals.0 as f64
@@ -72,4 +71,3 @@ pub async fn get_stats(State(state): State<AppState>) -> Json<StatsResponse> {
         error_rate,
     })
 }
-

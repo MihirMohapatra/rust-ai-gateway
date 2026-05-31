@@ -1,8 +1,8 @@
-use async_trait::async_trait;
-use reqwest::Client;
 use crate::models::chat::{ChatRequest, ChatResponse};
 use crate::providers::Provider;
 use crate::GatewayError;
+use async_trait::async_trait;
+use reqwest::Client;
 
 pub struct OpenAiProvider {
     client: Client,
@@ -52,10 +52,8 @@ impl Provider for OpenAiProvider {
             )));
         }
 
-        response
-            .json::<ChatResponse>()
-            .await
-            .map_err(|e| GatewayError::ProviderError(format!("Failed to parse OpenAI response: {}", e)))
+        response.json::<ChatResponse>().await.map_err(|e| {
+            GatewayError::ProviderError(format!("Failed to parse OpenAI response: {}", e))
+        })
     }
 }
-

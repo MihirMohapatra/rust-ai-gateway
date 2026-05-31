@@ -47,12 +47,17 @@ pub fn build_router(state: AppState, metrics_handle: PrometheusHandle) -> Router
         .route("/auth/register", post(routes::auth::register))
         .route("/auth/keys", post(routes::auth::create_api_key))
         .route("/api/stats", get(routes::stats::get_stats))
-        .route("/metrics", get(move || std::future::ready(metrics_handle.render())));
+        .route(
+            "/metrics",
+            get(move || std::future::ready(metrics_handle.render())),
+        );
 
     // Merge and apply global middleware
     public
         .merge(protected)
-        .layer(axum_middleware::from_fn(middleware::request_id::request_id_middleware))
+        .layer(axum_middleware::from_fn(
+            middleware::request_id::request_id_middleware,
+        ))
         .layer(CompressionLayer::new())
         .layer(TimeoutLayer::new(Duration::from_secs(60)))
         .layer(
@@ -100,7 +105,9 @@ pub async fn create_state(config: AppConfig) -> anyhow::Result<AppState> {
         tracing::info!("OpenAI provider enabled");
     }
 
-    providers.push(Box::new(OllamaProvider::new(config.ollama_base_url.clone())));
+    providers.push(Box::new(OllamaProvider::new(
+        config.ollama_base_url.clone(),
+    )));
     tracing::info!("Ollama provider enabled");
 
     Ok(AppState {

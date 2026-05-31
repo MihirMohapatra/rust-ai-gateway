@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use shared::providers::Provider;
-    use shared::providers::openai::OpenAiProvider;
     use shared::providers::ollama::OllamaProvider;
+    use shared::providers::openai::OpenAiProvider;
+    use shared::providers::Provider;
 
     #[test]
     fn test_openai_provider_supports_gpt_models() {
@@ -56,4 +56,3 @@ mod tests {
         assert_eq!(provider.name(), "ollama");
     }
 }
-

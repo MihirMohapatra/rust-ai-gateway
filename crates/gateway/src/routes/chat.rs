@@ -96,8 +96,10 @@ pub async fn chat_completions(
 
     // Update metrics
     metrics::counter!("gateway_requests_total", "model" => request.model.clone(), "provider" => provider.name().to_string(), "status" => status_code.to_string()).increment(1);
-    metrics::histogram!("gateway_request_duration_ms", "model" => request.model.clone()).record(latency_ms as f64);
-    metrics::gauge!("gateway_tokens_total", "model" => request.model.clone()).set(total_tokens as f64);
+    metrics::histogram!("gateway_request_duration_ms", "model" => request.model.clone())
+        .record(latency_ms as f64);
+    metrics::gauge!("gateway_tokens_total", "model" => request.model.clone())
+        .set(total_tokens as f64);
 
     match result {
         Ok(response) => Ok(Json(response)),

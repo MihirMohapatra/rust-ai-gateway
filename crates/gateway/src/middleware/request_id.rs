@@ -1,9 +1,4 @@
-use axum::{
-    extract::Request,
-    http::HeaderValue,
-    middleware::Next,
-    response::Response,
-};
+use axum::{extract::Request, http::HeaderValue, middleware::Next, response::Response};
 use uuid::Uuid;
 
 /// Adds a unique X-Request-ID header to every request/response for distributed tracing.
@@ -33,4 +28,3 @@ pub async fn request_id_middleware(mut request: Request, next: Next) -> Response
 
     response
 }
-

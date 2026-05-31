@@ -16,4 +16,3 @@ pub struct UsageLog {
     pub status_code: i16,
     pub created_at: DateTime<Utc>,
 }
-

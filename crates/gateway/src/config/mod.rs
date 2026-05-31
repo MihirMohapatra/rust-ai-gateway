@@ -15,8 +15,9 @@ pub struct AppConfig {
 impl AppConfig {
     pub fn from_env() -> Self {
         Self {
-            database_url: std::env::var("DATABASE_URL")
-                .unwrap_or_else(|_| "postgres://postgres:postgres@localhost:5432/ai_gateway".to_string()),
+            database_url: std::env::var("DATABASE_URL").unwrap_or_else(|_| {
+                "postgres://postgres:postgres@localhost:5432/ai_gateway".to_string()
+            }),
             redis_url: std::env::var("REDIS_URL")
                 .unwrap_or_else(|_| "redis://localhost:6379".to_string()),
             host: std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".to_string()),
@@ -56,7 +57,10 @@ mod tests {
 
         let config = AppConfig::from_env();
 
-        assert_eq!(config.database_url, "postgres://postgres:postgres@localhost:5432/ai_gateway");
+        assert_eq!(
+            config.database_url,
+            "postgres://postgres:postgres@localhost:5432/ai_gateway"
+        );
         assert_eq!(config.redis_url, "redis://localhost:6379");
         assert_eq!(config.host, "0.0.0.0");
         assert_eq!(config.port, 3000);

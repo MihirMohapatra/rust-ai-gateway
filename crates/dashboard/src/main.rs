@@ -1,9 +1,4 @@
-use axum::{
-    extract::State,
-    response::Html,
-    routing::get,
-    Router,
-};
+use axum::{extract::State, response::Html, routing::get, Router};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -20,8 +15,10 @@ async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
 
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::try_from_default_env()
-            .unwrap_or_else(|_| "dashboard=debug".into()))
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "dashboard=debug".into()),
+        )
         .with(tracing_subscriber::fmt::layer())
         .init();
 
@@ -55,16 +52,21 @@ async fn index(State(state): State<DashboardState>) -> Html<String> {
         .await
         .unwrap_or(0);
 
-    let total_tokens: i64 = sqlx::query_scalar("SELECT COALESCE(SUM(total_tokens), 0) FROM usage_logs")
-        .fetch_one(&state.db)
-        .await
-        .unwrap_or(0);
+    let total_tokens: i64 =
+        sqlx::query_scalar("SELECT COALESCE(SUM(total_tokens), 0) FROM usage_logs")
+            .fetch_one(&state.db)
+            .await
+            .unwrap_or(0);
 
-    let avg_latency: f64 = sqlx::query_scalar("SELECT COALESCE(AVG(latency_ms), 0) FROM usage_logs")
-        .fetch_one(&state.db)
-        .await
-        .unwrap_or(0.0);
+    let avg_latency: f64 =
+        sqlx::query_scalar("SELECT COALESCE(AVG(latency_ms), 0) FROM usage_logs")
+            .fetch_one(&state.db)
+            .await
+            .unwrap_or(0.0);
 
-    Html(templates::render_dashboard(total_requests, total_tokens, avg_latency))
+    Html(templates::render_dashboard(
+        total_requests,
+        total_tokens,
+        avg_latency,
+    ))
 }
-

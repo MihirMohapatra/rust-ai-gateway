@@ -15,4 +15,3 @@ pub struct ApiKey {
     pub is_active: bool,
     pub rate_limit: i32, // requests per minute
 }
-

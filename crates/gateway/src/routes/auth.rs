@@ -93,7 +93,9 @@ pub async fn create_api_key(
     State(state): State<AppState>,
     Json(body): Json<CreateKeyRequest>,
 ) -> Result<(StatusCode, Json<CreateKeyResponse>), (StatusCode, Json<serde_json::Value>)> {
-    use argon2::{password_hash::SaltString, Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+    use argon2::{
+        password_hash::SaltString, Argon2, PasswordHash, PasswordHasher, PasswordVerifier,
+    };
     use rand::rngs::OsRng;
 
     // Authenticate user by email/password
@@ -183,8 +185,8 @@ pub async fn create_api_key(
         Json(CreateKeyResponse {
             api_key: full_key,
             prefix,
-            message: "API key created. Store it securely — it cannot be retrieved again.".to_string(),
+            message: "API key created. Store it securely — it cannot be retrieved again."
+                .to_string(),
         }),
     ))
 }
-

@@ -152,7 +152,9 @@ pub fn render_dashboard(total_requests: i64, total_tokens: i64, avg_latency: f64
     </script>
 </body>
 </html>"#,
-        total_requests, total_tokens, avg_latency,
+        total_requests,
+        total_tokens,
+        avg_latency,
         req_gpt4 = (total_requests * 40 / 100).max(8),
         req_gpt4o = (total_requests * 25 / 100).max(5),
         req_llama = (total_requests * 20 / 100).max(4),
