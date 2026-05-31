@@ -1,0 +1,47 @@
+{
+  "dashboard": {
+    "title": "AI Gateway - Production Metrics",
+    "uid": "ai-gateway-main",
+    "panels": [
+      {
+        "title": "Request Rate (req/s)",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [{"expr": "rate(gateway_requests_total[5m])", "legendFormat": "{{model}} - {{status}}"}]
+      },
+      {
+        "title": "P99 Latency (ms)",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [{"expr": "histogram_quantile(0.99, rate(gateway_request_duration_ms_bucket[5m]))", "legendFormat": "p99"}]
+      },
+      {
+        "title": "Error Rate (%)",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 8},
+        "targets": [{"expr": "sum(rate(gateway_requests_total{status=~\"4..|5..\"}[5m])) / sum(rate(gateway_requests_total[5m])) * 100"}]
+      },
+      {
+        "title": "Active DB Connections",
+        "type": "gauge",
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 8},
+        "targets": [{"expr": "gateway_db_pool_size - gateway_db_pool_idle"}]
+      },
+      {
+        "title": "Tokens/min by Model",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [{"expr": "sum by (model) (rate(gateway_tokens_total[1m]))", "legendFormat": "{{model}}"}]
+      },
+      {
+        "title": "Rate Limit Rejections",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [{"expr": "rate(gateway_requests_total{status=\"429\"}[5m])", "legendFormat": "429 - Rate Limited"}]
+      }
+    ],
+    "time": {"from": "now-1h", "to": "now"},
+    "refresh": "10s"
+  }
+}
+
