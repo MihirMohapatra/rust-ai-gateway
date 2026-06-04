@@ -122,9 +122,7 @@ pub async fn create_state(config: AppConfig) -> anyhow::Result<AppState> {
         providers.push(Box::new(provider));
         tracing::info!("Anthropic provider enabled");
     } else {
-        tracing::warn!(
-            "ANTHROPIC_API_KEY not set - Claude models will be unavailable"
-        );
+        tracing::warn!("ANTHROPIC_API_KEY not set - Claude models will be unavailable");
     }
 
     providers.push(Box::new(OllamaProvider::new(

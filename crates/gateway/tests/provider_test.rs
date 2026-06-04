@@ -222,7 +222,10 @@ async fn test_anthropic_provider_success() {
     assert_eq!(response.choices.len(), 1);
     assert_eq!(response.choices[0].message.role, "assistant");
     assert_eq!(response.choices[0].message.content, "Hi there! I'm Claude.");
-    assert_eq!(response.choices[0].finish_reason, Some("end_turn".to_string()));
+    assert_eq!(
+        response.choices[0].finish_reason,
+        Some("end_turn".to_string())
+    );
 
     let usage = response.usage.as_ref().unwrap();
     assert_eq!(usage.prompt_tokens, 12);
@@ -243,7 +246,10 @@ async fn test_anthropic_provider_strips_system_message() {
         .await;
 
     let provider = AnthropicProvider::new("sk-ant-key".to_string(), Some(mock_server.uri()));
-    let _ = provider.chat_completion(&sample_claude_request()).await.unwrap();
+    let _ = provider
+        .chat_completion(&sample_claude_request())
+        .await
+        .unwrap();
 
     // The mock would not have matched if system message wasn't stripped correctly,
     // and we expect exactly 1 request thanks to `.expect(1)`.
@@ -309,7 +315,10 @@ async fn test_anthropic_provider_rejects_streaming() {
 
 #[tokio::test]
 async fn test_anthropic_provider_connection_refused() {
-    let provider = AnthropicProvider::new("sk-ant-key".to_string(), Some("http://127.0.0.1:19998".to_string()));
+    let provider = AnthropicProvider::new(
+        "sk-ant-key".to_string(),
+        Some("http://127.0.0.1:19998".to_string()),
+    );
     let result = provider.chat_completion(&sample_claude_request()).await;
     assert!(result.is_err());
     assert_eq!(result.unwrap_err().status_code(), 502);
