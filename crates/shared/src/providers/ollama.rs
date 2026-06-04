@@ -25,9 +25,22 @@ impl Provider for OllamaProvider {
     }
 
     fn supports_model(&self, model: &str) -> bool {
-        // Ollama supports models like llama3, mistral, codellama, etc.
-        // If it's not an OpenAI model, route to Ollama
-        !model.starts_with("gpt-") && !model.starts_with("o1") && !model.starts_with("o3")
+        // Ollama supports local models like llama3, mistral, codellama, phi3, gemma, etc.
+        // Explicit allowlist for known local families - we no longer act as a catch-all
+        // so that other providers (e.g. Anthropic) can claim their own model families.
+        let m = model.to_lowercase();
+        m.starts_with("llama")
+            || m.starts_with("mistral")
+            || m.starts_with("mixtral")
+            || m.starts_with("codellama")
+            || m.starts_with("phi")
+            || m.starts_with("gemma")
+            || m.starts_with("qwen")
+            || m.starts_with("deepseek")
+            || m.starts_with("vicuna")
+            || m.starts_with("dolphin")
+            || m.starts_with("nous")
+            || m.starts_with("orca")
     }
 
     async fn chat_completion(&self, request: &ChatRequest) -> Result<ChatResponse, GatewayError> {

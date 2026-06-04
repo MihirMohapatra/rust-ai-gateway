@@ -8,6 +8,9 @@ pub struct AppConfig {
     pub port: u16,
     pub openai_api_key: Option<String>,
     pub ollama_base_url: Option<String>,
+    pub anthropic_api_key: Option<String>,
+    pub anthropic_base_url: Option<String>,
+    pub anthropic_api_version: Option<String>,
     pub jwt_secret: String,
     pub global_rate_limit: u32, // requests per minute globally
 }
@@ -27,6 +30,9 @@ impl AppConfig {
                 .unwrap_or(3000),
             openai_api_key: std::env::var("OPENAI_API_KEY").ok(),
             ollama_base_url: std::env::var("OLLAMA_BASE_URL").ok(),
+            anthropic_api_key: std::env::var("ANTHROPIC_API_KEY").ok(),
+            anthropic_base_url: std::env::var("ANTHROPIC_BASE_URL").ok(),
+            anthropic_api_version: std::env::var("ANTHROPIC_API_VERSION").ok(),
             jwt_secret: std::env::var("JWT_SECRET")
                 .unwrap_or_else(|_| "dev-secret-change-in-production".to_string()),
             global_rate_limit: std::env::var("GLOBAL_RATE_LIMIT")
@@ -54,6 +60,9 @@ mod tests {
         std::env::remove_var("GLOBAL_RATE_LIMIT");
         std::env::remove_var("OPENAI_API_KEY");
         std::env::remove_var("OLLAMA_BASE_URL");
+        std::env::remove_var("ANTHROPIC_API_KEY");
+        std::env::remove_var("ANTHROPIC_BASE_URL");
+        std::env::remove_var("ANTHROPIC_API_VERSION");
 
         let config = AppConfig::from_env();
 
