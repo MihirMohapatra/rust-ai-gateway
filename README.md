@@ -15,12 +15,13 @@
   <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" />
   <img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white" />
   <img src="https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white" />
+  <img src="https://img.shields.io/badge/Anthropic-000000?style=for-the-badge&logo=anthropic&logoColor=white" />
   <img src="https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white" />
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/build-passing-brightgreen?style=flat-square" />
-  <img src="https://img.shields.io/badge/tests-19%20passing-brightgreen?style=flat-square" />
+  <img src="https://img.shields.io/badge/tests-29%20passing-brightgreen?style=flat-square" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" />
   <img src="https://img.shields.io/badge/rust-1.82+-orange?style=flat-square&logo=rust" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" />
@@ -121,7 +122,7 @@ This is not a toy project. It's a **production-ready distributed system** that d
 |-------|---------------|
 | **Systems Programming** | Rust, zero-copy, memory-safe concurrency |
 | **Distributed Systems** | Multi-node, shared state via Redis, eventual consistency |
-| **AI/ML Backend** | OpenAI + Ollama provider abstraction, token tracking |
+| **AI/ML Backend** | OpenAI + Anthropic + Ollama provider abstraction, token tracking |
 | **Cloud Engineering** | AWS ECS Fargate, RDS, ElastiCache, ALB, Terraform IaC |
 | **Observability** | Structured logging, Prometheus metrics, Grafana dashboards |
 | **Security** | Argon2 hashing, per-key rate limiting, request isolation |
@@ -161,14 +162,15 @@ This is not a toy project. It's a **production-ready distributed system** that d
      │   └─────────────────────┘   └──────────────────────────┘   └─────────────────┘  │
      └──────────────────────────────────────────────────────────────────────────────────┘
                     │
-     ┌──────────────┼──────────────────────────┐
-     │              ▼                          │
-     │   ┌──────────────────┐   ┌───────────┐ │
-     │   │   OpenAI API     │   │  Ollama   │ │    AI Providers
-     │   │  (GPT-4, o1, o3) │   │ (Llama3,  │ │
-     │   │                  │   │  Mistral)  │ │
-     │   └──────────────────┘   └───────────┘ │
-     └─────────────────────────────────────────┘
+     ┌──────────────┼────────────────────────────────────────────┐
+     │              ▼                                            │
+     │   ┌──────────────────┐   ┌───────────┐   ┌──────────────┐ │
+     │   │   OpenAI API     │   │  Ollama   │   │   Anthropic  │ │    AI Providers
+     │   │  (GPT-4, o1, o3) │   │ (Llama3,  │   │ (Claude 3/3.5│ │
+     │   │                  │   │  Mistral)  │   │   Sonnet,    │ │
+     │   │                  │   │           │   │   Opus, Haiku│ │
+     │   └──────────────────┘   └───────────┘   └──────────────┘ │
+     └───────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -194,7 +196,7 @@ Client Request
 │ 6. Rate Limiter    │──── Redis sliding window counter
 │                    │──── Returns 429 if exceeded
 ├────────────────────┤
-│ 7. Provider Router │──── Selects OpenAI/Ollama based on model
+│ 7. Provider Router │──── Selects OpenAI/Anthropic/Ollama based on model
 ├────────────────────┤
 │ 8. Proxy Request   │──── Forwards to upstream provider
 ├────────────────────┤
@@ -303,6 +305,7 @@ Client Response (with X-Request-ID)
 | Database | **PostgreSQL 16** via SQLx | Type-safe queries, compile-time checking |
 | Cache | **Redis 7** | Atomic operations for rate limiting |
 | AI: Cloud | **OpenAI API** | GPT-4, o1, o3 models |
+| AI: Cloud | **Anthropic API** | Claude 3/3.5 Sonnet, Opus, Haiku |
 | AI: Local | **Ollama** | Llama3, Mistral, CodeLlama |
 | Metrics | **Prometheus** | Industry standard, PromQL |
 | Dashboards | **Grafana** | Pre-provisioned dashboards |
@@ -321,6 +324,7 @@ Client Response (with X-Request-ID)
 - Docker & Docker Compose
 - (Optional) Rust 1.82+ for local development
 - (Optional) OpenAI API key for cloud models
+- (Optional) Anthropic API key for Claude models
 
 ### Run with Docker (Recommended)
 
@@ -331,7 +335,7 @@ cd ai-gateway
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your OPENAI_API_KEY (optional)
+# Edit .env with your OPENAI_API_KEY and ANTHROPIC_API_KEY (both optional)
 
 # Start all services (gateway + postgres + redis + ollama + monitoring)
 docker-compose up -d
@@ -449,6 +453,8 @@ Content-Type: application/json
 |-------|----------|-------|
 | `gpt-4`, `gpt-4o`, `gpt-3.5-turbo` | OpenAI | Requires OPENAI_API_KEY |
 | `o1-preview`, `o1-mini`, `o3-mini` | OpenAI | Reasoning models |
+| `claude-3-5-sonnet-*`, `claude-3-opus-*`, `claude-3-haiku-*` | Anthropic | Requires ANTHROPIC_API_KEY |
+| `claude-2`, `claude-2.1` | Anthropic | Legacy models |
 | `llama3`, `mistral`, `codellama` | Ollama | Local, free, private |
 
 ### Metrics & Stats
@@ -987,6 +993,7 @@ ai-gateway/
 │   │   │   ├── models/          # Domain models (User, ApiKey, etc.)
 │   │   │   └── providers/       # Provider trait + implementations
 │   │   │       ├── openai.rs    # OpenAI HTTP client
+│   │   │       ├── anthropic.rs # Anthropic (Claude) HTTP client
 │   │   │       └── ollama.rs    # Ollama HTTP client
 │   │   └── tests/               # Unit tests
 │

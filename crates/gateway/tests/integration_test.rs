@@ -54,6 +54,9 @@ async fn setup_test_state(database_url: &str, redis_url: Option<&str>) -> AppSta
         port: 0,
         openai_api_key: None,
         ollama_base_url: Some("http://localhost:11434".to_string()),
+        anthropic_api_key: None,
+        anthropic_base_url: None,
+        anthropic_api_version: None,
         jwt_secret: "test-secret".to_string(),
         global_rate_limit: 1000,
     };

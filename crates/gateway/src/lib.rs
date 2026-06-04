@@ -18,6 +18,7 @@ use tower_http::timeout::TimeoutLayer;
 use tower_http::trace::{DefaultMakeSpan, DefaultOnResponse, TraceLayer};
 use tracing::Level;
 
+use shared::providers::anthropic::AnthropicProvider;
 use shared::providers::ollama::OllamaProvider;
 use shared::providers::openai::OpenAiProvider;
 use shared::providers::Provider;
@@ -103,6 +104,25 @@ pub async fn create_state(config: AppConfig) -> anyhow::Result<AppState> {
     if let Some(ref api_key) = config.openai_api_key {
         providers.push(Box::new(OpenAiProvider::new(api_key.clone(), None)));
         tracing::info!("OpenAI provider enabled");
+    } else {
+        tracing::warn!(
+            "OPENAI_API_KEY not set - OpenAI models (gpt-*, o1-*, o3-*) will be unavailable"
+        );
+    }
+
+    if let Some(ref api_key) = config.anthropic_api_key {
+        let provider = match config.anthropic_api_version.as_ref() {
+            Some(version) => AnthropicProvider::with_version(
+                api_key.clone(),
+                config.anthropic_base_url.clone(),
+                version.clone(),
+            ),
+            None => AnthropicProvider::new(api_key.clone(), config.anthropic_base_url.clone()),
+        };
+        providers.push(Box::new(provider));
+        tracing::info!("Anthropic provider enabled");
+    } else {
+        tracing::warn!("ANTHROPIC_API_KEY not set - Claude models will be unavailable");
     }
 
     providers.push(Box::new(OllamaProvider::new(
